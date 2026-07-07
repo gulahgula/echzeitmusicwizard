@@ -11,6 +11,10 @@ Explore Berlin's experimental music calendar from [echtzeitmusik.de](https://ech
 - **Calendar view** — see followed artists' events on a monthly calendar
 - **ICS export** — export individual events to your calendar
 
+## How To Use
+
+See [HOWTO.md](./HOWTO.md) for a full walkthrough of the popup, analysis page, notifications, and tips.
+
 ## Install (Developer Mode)
 
 1. Open `chrome://extensions`
