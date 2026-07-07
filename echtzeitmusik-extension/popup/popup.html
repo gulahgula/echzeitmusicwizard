@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="header-row">
+        <h1>echtzeitmusik</h1>
+      </div>
+      <div class="filter-bar">
+        <button data-filter="today" class="active" aria-label="Show today's concerts">today</button>
+        <button data-filter="tomorrow" aria-label="Show tomorrow's concerts">tomorrow</button>
+        <button data-filter="next7" aria-label="Show next 7 days">7 days</button>
+        <button data-filter="month" aria-label="Show this month">month</button>
+        <button data-filter="all" aria-label="Show all concerts">all</button>
+        <button data-filter="notifications" class="notif-tab-btn" aria-label="Show notifications">🔔</button>
+      </div>
+      <div class="wizard-bar">
+        <a href="#" id="open-analysis" class="wizard-btn">⚡ ech wizard — explore artists, instruments & concerts</a>
+      </div>
+    </header>
+    <div id="content">
+      <div id="loading">Loading concerts…</div>
+      <div id="error" class="hidden"></div>
+      <div id="overview"></div>
+      <div id="event-list"></div>
+    </div>
+    <footer>
+      <a href="#" id="open-about">About</a>
+      <a href="https://buymeacoffee.com/gulahgula" target="_blank" class="tip-link">Tip 💛</a>
+    </footer>
+  </div>
+  <script src="../shared/parser.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

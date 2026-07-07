@@ -1,0 +1,472 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #1a1a1a;
+  --bg-dark: #111;
+  --bg-surface: #2a2a2a;
+  --border: #3a3a3a;
+  --text: #e0e0e0;
+  --text-muted: #aaa;
+  --text-dim: #888;
+  --amber: #ffd54f;
+  --blue: #81d4fa;
+  --green: #66bb6a;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  width: 480px;
+  min-height: 200px;
+}
+
+#app { display: flex; flex-direction: column; min-height: 200px; }
+
+header {
+  background: linear-gradient(180deg, #2f2f2f 0%, #2a2a2a 100%);
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid #3a3a3a;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.header-row h1 { margin-bottom: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; color: #e0e0e0; }
+
+.wizard-bar { margin-top: 6px; }
+
+.wizard-btn {
+  display: block;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0a0a0a;
+  text-decoration: none;
+  background: linear-gradient(135deg, #ffd54f 0%, #ffab00 100%);
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  transition: all 0.15s;
+}
+
+.wizard-btn:hover {
+  background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(255, 213, 79, 0.25);
+}
+
+.filter-bar { display: flex; gap: 4px; }
+
+.filter-bar button {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background: #333;
+  color: #999;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.filter-bar button:hover { background: #3a3a3a; color: #ccc; }
+.filter-bar button.active { background: #555; color: #fff; border-color: #777; }
+
+#content { flex: 1; overflow-y: auto; }
+
+#loading, #error {
+  padding: 32px 16px;
+  text-align: center;
+  color: #888;
+}
+
+#error { color: #e57373; }
+.hidden { display: none; }
+
+/* ── Overview ── */
+
+.overview-section {
+  font-size: 14px;
+  color: #bbb;
+  padding: 14px 16px 12px;
+  background: #141414;
+  border-bottom: 2px solid #ffd54f;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.overview-section .stat {
+  color: #ffd54f;
+  font-weight: 700;
+}
+
+.overview-section .venue-name {
+  color: #81d4fa;
+}
+
+.overview-summary {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.followed-hint {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.followed-hint-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  padding: 1px 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.followed-hint-concerts {
+  color: #888;
+}
+
+.followed-hint-artist {
+  color: #66bb6a;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.followed-hint-venue {
+  color: #888;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.followed-hint-more {
+  color: #555;
+  font-size: 11px;
+  padding-top: 2px;
+}
+
+.followed-hint .nowrap {
+  white-space: nowrap;
+}
+
+.followed-hint .nowrap .venue-name {
+  color: #81d4fa;
+}
+
+/* ── Event card ── */
+
+.event {
+  padding: 10px 16px;
+  border-bottom: 1px solid #2a2a2a;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.event:hover { background: #222; }
+.event:active { background: #252525; }
+
+.event-past { opacity: 0.4; }
+
+/* Followed artist — subtle green dot, no bar, no NOW */
+.event-has-followed:not(.event-is-now) {
+  padding-left: 22px;
+  position: relative;
+}
+.event-has-followed:not(.event-is-now)::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #66bb6a;
+  opacity: 0.7;
+}
+
+/* Time-based NOW — full green bar + NOW text */
+.event-is-now {
+  padding-left: 24px;
+}
+.event-is-now::before {
+  content: 'NOW';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  background: #66bb6a;
+  color: #0a0a0a;
+  font-size: 7px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3px;
+}
+
+.event-time {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffd54f;
+  white-space: nowrap;
+}
+
+.event-day {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.event-venue {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 1px;
+}
+
+.event-venue a { color: #81d4fa; text-decoration: none; }
+.event-venue a:hover { text-decoration: underline; }
+
+.event-address {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+/* ── Original description ── */
+
+.event-desc {
+  font-size: 11px;
+  color: #888;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.event-desc br { content: ''; display: block; margin-bottom: 0.3em; }
+
+/* ── Artist follow row ── */
+
+.event-artists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-bottom: 6px;
+}
+
+.artist-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: #bbb;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  padding: 2px 7px;
+  transition: border-color 0.15s;
+}
+
+.artist-tag:hover { border-color: #555; }
+
+.artist-name { white-space: nowrap; }
+
+.artist-name.followed {
+  color: #66bb6a;
+  font-weight: 600;
+}
+
+.follow-btn {
+  color: #81d4fa;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #3a3a3a;
+  margin-left: 4px;
+  transition: all 0.15s;
+}
+
+.follow-btn:hover { color: #4fc3f7; border-color: #81d4fa; }
+
+.follow-btn.followed {
+  color: #66bb6a;
+  border-color: #66bb6a;
+}
+
+/* ── Links ── */
+
+.event-links {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.event-links a {
+  font-size: 10px;
+  color: #81d4fa;
+  text-decoration: none;
+  padding: 1px 5px;
+  border: 1px solid #3a3a3a;
+  border-radius: 3px;
+}
+
+.event-links a:hover { background: #333; border-color: #81d4fa; }
+
+.event-links a.calendar-link { color: #ffd54f; border-color: #ffd54f; }
+.event-links a.calendar-link:hover { background: #ffd54f; color: #1a1a1a; }
+
+/* ── Footer ── */
+
+footer {
+  padding: 8px 16px;
+  background: #2a2a2a;
+  border-top: 1px solid #3a3a3a;
+  box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
+  display: flex;
+  justify-content: space-between;
+  position: sticky;
+  bottom: 0;
+}
+
+footer a {
+  color: #888;
+  text-decoration: none;
+  font-size: 11px;
+  transition: color 0.15s;
+}
+
+footer a:hover { color: #ccc; }
+
+footer a.tip-link { color: #ffd54f; font-weight: 600; }
+footer a.tip-link:hover { color: #ffab00; }
+
+footer a#open-settings { color: #81d4fa; font-weight: 600; }
+
+/* ── misc ── */
+
+.event-count {
+  font-size: 11px;
+  color: #888;
+  padding: 0 16px 6px;
+}
+
+.notif-dismiss {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.notif-dismiss:hover { color: #e57373; }
+
+/* ── Notifications tab list ── */
+
+.notif-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 0 0 6px;
+  background: #1a1a0a;
+  border: 1px solid #2a2a0a;
+  border-left: 3px solid #ffd54f;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.notif-list-item .notif-dismiss {
+  margin-top: 2px;
+  font-size: 16px;
+}
+
+.notif-list-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-list-artist {
+  font-weight: 700;
+  color: #ffd54f;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.notif-list-detail {
+  color: #bbb;
+  font-size: 12px;
+}
+
+.notif-list-address {
+  color: #777;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+/* ── Notifications settings ── */
+
+.notif-settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  background: #141414;
+  border: 1px solid #222;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.notif-settings-label {
+  color: #888;
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+.notif-mode-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #bbb;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.notif-mode-label input[type="radio"] {
+  accent-color: #ffd54f;
+}
