@@ -46,7 +46,6 @@ async function checkArtistNow(artistName) {
     updateBadge();
     return { ok: true, upcoming: upcoming.length };
   } catch (e) {
-    console.error('checkArtistNow failed:', e);
     return { ok: false };
   }
 }
@@ -101,7 +100,7 @@ async function checkAllArtists() {
 
     updateBadge();
   } catch (e) {
-    console.error('checkAllArtists failed:', e);
+    // Silently handle fetch/parse errors
   }
 }
 

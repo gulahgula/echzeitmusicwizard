@@ -31,25 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     content.classList.toggle('collapsed');
   });
 
-  // Donation reminder check
-  chrome.storage.local.get(['wizardOpens', 'lastTipPrompt'], (result) => {
-    const count = result.wizardOpens || 0;
-    const lastPrompt = parseInt(result.lastTipPrompt) || 0;
-    const milestones = [10, 50, 100, 250, 500, 1000];
-    if (milestones.includes(count) && lastPrompt !== count) {
-      setTimeout(() => {
-        const banner = document.createElement('div');
-        banner.className = 'tip-banner';
-        banner.innerHTML = `🎵 You've opened ech wizard <strong>${count}</strong> times! Like it? <a href="https://buymeacoffee.com/gulahgula" target="_blank" class="tip-banner-link">Tip me a coffee</a> <span class="tip-dismiss" id="dismiss-tip">✕</span>`;
-        document.querySelector('main').prepend(banner);
-        document.getElementById('dismiss-tip').addEventListener('click', () => {
-          banner.remove();
-          chrome.storage.local.set({ lastTipPrompt: count });
-        });
-      }, 500);
-    }
-  });
-
   let events = [];
   let artistMap = {};
   let fullArtistMap = {};
@@ -1301,11 +1282,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (idx === -1) {
       watchedArtists.push(name);
       el.textContent = '✓ Following';
-      chrome.runtime.sendMessage({ action: 'artistFollowed', name }, (rsp) => {
-        if (chrome.runtime.lastError) {
-          console.warn('Background SW not reachable for notification:', chrome.runtime.lastError.message);
-        }
-      });
+      chrome.runtime.sendMessage({ action: 'artistFollowed', name }).catch(() => {});
     } else {
       watchedArtists.splice(idx, 1);
       el.textContent = '+ Follow artist';

@@ -21,4 +21,4 @@ See [INSTALL.md](./INSTALL.md) for Chrome Web Store and manual installation inst
 
 ## Privacy
 
-This extension stores the list of artists you follow (and dismissed/seen notification IDs) in `chrome.storage.local`. No data is sent to any server. See [PRIVACY.md](./PRIVACY.md) for details.
+This extension stores the list of artists you follow (and dismissed/seen notification IDs) in `chrome.storage.local`. No data is sent to any server. The content script runs on all URLs (`<all_urls>`) only to show toast notifications on any page — no data is collected. See [PRIVACY.md](./PRIVACY.md) for details.

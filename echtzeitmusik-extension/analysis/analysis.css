@@ -98,39 +98,6 @@ header h1 {
 
 .hidden { display: none; }
 
-/* ── Tip banner ── */
-
-.tip-banner {
-  background: linear-gradient(135deg, #2a2a2a 0%, #333 100%);
-  border: 1px solid #ffd54f;
-  border-radius: 8px;
-  padding: 12px 18px;
-  margin-bottom: 16px;
-  font-size: 14px;
-  color: #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.tip-banner-link {
-  color: #ffd54f;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.tip-banner-link:hover { text-decoration: underline; }
-
-.tip-dismiss {
-  cursor: pointer;
-  color: #666;
-  font-size: 14px;
-  padding: 2px 6px;
-}
-
-.tip-dismiss:hover { color: #999; }
-
 main {
   padding: 20px 24px;
   max-width: 900px;

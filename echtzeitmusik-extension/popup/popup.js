@@ -57,11 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('open-analysis').addEventListener('click', e => {
     e.preventDefault();
-    // Donation reminder counter
-    chrome.storage.local.get(['wizardOpens'], (result) => {
-      const count = (result.wizardOpens || 0) + 1;
-      chrome.storage.local.set({ wizardOpens: count });
-    });
     chrome.tabs.create({ url: chrome.runtime.getURL('analysis/analysis.html') + '#today' });
   });
 
@@ -449,11 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Following';
       btn.classList.add('followed');
       if (nameSpan) { nameSpan.textContent = `✓ ${name}`; nameSpan.classList.add('followed'); }
-      chrome.runtime.sendMessage({ action: 'artistFollowed', name }, (rsp) => {
-        if (chrome.runtime.lastError) {
-          console.warn('Background SW not reachable for notification:', chrome.runtime.lastError.message);
-        }
-      });
+      chrome.runtime.sendMessage({ action: 'artistFollowed', name }).catch(() => {});
     } else {
       watchedArtists.splice(idx, 1);
       btn.textContent = '+ Follow';
