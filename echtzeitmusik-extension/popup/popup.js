@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const day   = (tr1.querySelector('td.datum:nth-child(2)')?.textContent || '').trim();
       const month = (tr1.querySelector('td.datum:nth-child(3)')?.textContent || '').trim();
       const year  = (tr1.querySelector('td.datum:nth-child(4)')?.textContent || '').trim();
-      const dateStr = `${day}${month}${year ? '20' + year : ''}`;
+      const dateStr = `${day}.${month}.${year ? '20' + year : ''}`;
 
       const addressDiv = tr1.querySelector('.calender-entry-address');
       const address = addressDiv?.textContent?.replace(/\s+/g, ' ').trim() || '';
@@ -185,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const evStart = parseEventDateTime(ev.dateStr, ev.time);
       if (!evStart) return;
       const diffMin = (evStart.getTime() - now.getTime()) / 60000;
-      card.classList.toggle('event-is-now', diffMin <= 30 && diffMin > -120);
+      card.classList.toggle('event-is-now', diffMin <= 0 && diffMin > -120);
+      card.classList.toggle('event-is-soon', diffMin > 0 && diffMin <= 60);
     });
   }
 
@@ -258,7 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const evStart = parseEventDateTime(ev.dateStr, ev.time);
       if (evStart) {
         const diffMin = (evStart.getTime() - now.getTime()) / 60000;
-        if (diffMin <= 30 && diffMin > -120) div.classList.add('event-is-now');
+        if (diffMin <= 0 && diffMin > -120) div.classList.add('event-is-now');
+        if (diffMin > 0 && diffMin <= 60) div.classList.add('event-is-soon');
       }
 
       // Original description

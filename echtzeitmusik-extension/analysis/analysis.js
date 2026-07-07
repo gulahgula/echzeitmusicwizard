@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const day   = (tr1.querySelector('td.datum:nth-child(2)')?.textContent || '').trim();
       const month = (tr1.querySelector('td.datum:nth-child(3)')?.textContent || '').trim();
       const year  = (tr1.querySelector('td.datum:nth-child(4)')?.textContent || '').trim();
-      const dateStr = `${day}${month}${year ? '20' + year : ''}`;
+      const dateStr = `${day}.${month}.${year ? '20' + year : ''}`;
 
       const addressDiv = tr1.querySelector('.calender-entry-address');
       const address = addressDiv?.textContent?.replace(/\s+/g, ' ').trim() || '';

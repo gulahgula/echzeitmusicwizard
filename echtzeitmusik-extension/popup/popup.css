@@ -188,11 +188,11 @@ header {
 .event-past { opacity: 0.4; }
 
 /* Followed artist — subtle green dot, no bar, no NOW */
-.event-has-followed:not(.event-is-now) {
+.event-has-followed:not(.event-is-now):not(.event-is-soon) {
   padding-left: 22px;
   position: relative;
 }
-.event-has-followed:not(.event-is-now)::before {
+.event-has-followed:not(.event-is-now):not(.event-is-soon)::before {
   content: '';
   position: absolute;
   left: 6px;
@@ -205,12 +205,15 @@ header {
   opacity: 0.7;
 }
 
-/* Time-based NOW — full green bar + NOW text */
+/* Time-based NOW — full green bar + stacked NOW */
 .event-is-now {
   padding-left: 24px;
 }
 .event-is-now::before {
   content: 'NOW';
+  writing-mode: vertical-lr;
+  text-orientation: upright;
+  letter-spacing: -2px;
   position: absolute;
   left: 0;
   top: 0;
@@ -218,10 +221,34 @@ header {
   width: 16px;
   background: #66bb6a;
   color: #0a0a0a;
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 900;
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+/* Time-based SOON — amber bar + stacked SOON */
+.event-is-soon {
+  padding-left: 24px;
+}
+.event-is-soon::before {
+  content: 'SOON';
+  writing-mode: vertical-lr;
+  text-orientation: upright;
+  letter-spacing: -2px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  background: #ffb300;
+  color: #0a0a0a;
+  font-size: 8px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   justify-content: center;
   writing-mode: vertical-rl;
   text-orientation: upright;
