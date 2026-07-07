@@ -107,6 +107,7 @@ function isNoiseWord(w) {
     'butoh','dance','act','grunge','singer','songwriter',
     'palace','nahmaschine',
     'quintett','quartett','duo','solo',
+    'monitor','kopfhorer','mikrofon','kabel','pedal','effector',
   ]);
   const n = w.toLowerCase()
     .replace(/ö/g,'o').replace(/ü/g,'u').replace(/ä/g,'a')
@@ -167,4 +168,37 @@ function looksLikePersonName(s) {
   }
 
   return true;
+}
+
+function parseEventDateTime(dateStr, time) {
+  const parts = dateStr.replace(/\.\s*/g, '.').split('.').filter(Boolean);
+  if (parts.length < 3) return null;
+  const [day, month, year] = parts;
+  const [hour, minute] = time.split('.').map(s => parseInt(s, 10));
+  const fullYear = year.length === 2 ? 2000 + parseInt(year) : parseInt(year);
+  return new Date(fullYear, parseInt(month) - 1, parseInt(day), hour || 0, minute || 0);
+}
+
+function downloadICS(event) {
+  const [day, month, year] = event.dateStr.replace(/\.\s*/g, '.').split('.').filter(Boolean);
+  const [hour, minute] = event.time.split('.');
+  const fullYear = year.length === 2 ? '20' + year : year;
+  const dtStart = `${fullYear}${month.padStart(2,'0')}${day.padStart(2,'0')}T${hour.padStart(2,'0')}${minute.padStart(2,'0')}00`;
+  const endH = String(parseInt(hour) + 2).padStart(2, '0');
+  const dtEnd = `${fullYear}${month.padStart(2,'0')}${day.padStart(2,'0')}T${endH}${minute.padStart(2,'0')}00`;
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//echtzeitmusik-extension//EN',
+    'BEGIN:VEVENT',`DTSTART:${dtStart}`,`DTEND:${dtEnd}`,
+    `SUMMARY:${event.venueName}`,`LOCATION:${event.address}`,
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `echtzeitmusik-${event.dateStr.replace(/\.\s*/g, '')}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }

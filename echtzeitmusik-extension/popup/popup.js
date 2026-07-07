@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (watchedArtists.join(',') !== (result.watchedArtists || []).join(',')) {
       chrome.storage.local.set({ watchedArtists });
     }
-    updateFollowCount();
     if (loadedEvents.length > 0) {
       renderOverview(loadedEvents, currentFilter);
       refreshFollowedBars();
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.watchedArtists) {
       watchedArtists = changes.watchedArtists.newValue || [];
-      updateFollowCount();
       if (loadedEvents.length > 0) {
         renderOverview(loadedEvents, currentFilter);
         refreshFollowedBars();
@@ -36,8 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   setInterval(refreshNowBars, 60000);
-
-  function updateFollowCount() {}
 
   // Clear badge on popup open
   chrome.action.setBadgeText({ text: '' });
@@ -379,23 +375,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Time helpers ──
 
-  function parseEventDateTime(dateStr, time) {
-    const parts = dateStr.replace(/\.\s*/g, '.').split('.').filter(Boolean);
-    if (parts.length < 3) return null;
-    const [day, month, year] = parts;
-    const [hour, minute] = time.split('.').map(s => parseInt(s, 10));
-    const fullYear = year.length === 2 ? 2000 + parseInt(year) : parseInt(year);
-    return new Date(fullYear, parseInt(month) - 1, parseInt(day), hour || 0, minute || 0);
-  }
-
   function isEventPast(ev, now) {
-    const [d, m, y] = ev.dateStr.replace(/\.\s*/g, '.').split('.').filter(Boolean);
-    if (!d || !m || !y) return false;
-    const [h, min] = ev.time.split('.').map(s => parseInt(s, 10));
-    const fullYear = y.length === 2 ? 2000 + parseInt(y) : parseInt(y);
-    const eventStart = new Date(fullYear, parseInt(m) - 1, parseInt(d), h || 0, min || 0);
-    // Consider past if it ended more than 1 hour ago
-    return (now.getTime() - eventStart.getTime()) > 2 * 60 * 60 * 1000;
+    const evStart = parseEventDateTime(ev.dateStr, ev.time);
+    if (!evStart) return false;
+    return (now.getTime() - evStart.getTime()) > 2 * 60 * 60 * 1000;
   }
 
   // ── Basic artist extraction for popup ──
@@ -454,7 +437,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (nameSpan) { nameSpan.textContent = name; nameSpan.classList.remove('followed'); }
     }
     chrome.storage.local.set({ watchedArtists });
-    updateFollowCount();
     // Update followed indicators on all visible events
     document.querySelectorAll('.event-has-followed').forEach(el => {
       const has = [...el.querySelectorAll('.artist-name.followed')].length > 0;
@@ -462,31 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── ICS download ──
-
-  function downloadICS(event) {
-    const [day, month, year] = event.dateStr.replace(/\.\s*/g, '.').split('.').filter(Boolean);
-    const [hour, minute] = event.time.split('.');
-    const fullYear = year.length === 2 ? '20' + year : year;
-    const dtStart = `${fullYear}${month.padStart(2,'0')}${day.padStart(2,'0')}T${hour.padStart(2,'0')}${minute.padStart(2,'0')}00`;
-    const endH = String(parseInt(hour) + 2).padStart(2, '0');
-    const dtEnd = `${fullYear}${month.padStart(2,'0')}${day.padStart(2,'0')}T${endH}${minute.padStart(2,'0')}00`;
-    const ics = [
-      'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//echtzeitmusik-extension//EN',
-      'BEGIN:VEVENT',`DTSTART:${dtStart}`,`DTEND:${dtEnd}`,
-      `SUMMARY:${event.venueName}`,`LOCATION:${event.address}`,
-      'END:VEVENT','END:VCALENDAR'
-    ].join('\r\n');
-    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `echtzeitmusik-${event.dateStr.replace(/\.\s*/g, '')}.ics`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
+  // ── ICS download (shared in shared/parser.js) ──
 
   function createLink(href, label) {
     const a = document.createElement('a');
