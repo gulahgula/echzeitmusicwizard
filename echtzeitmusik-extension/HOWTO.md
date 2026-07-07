@@ -1,5 +1,7 @@
 # How To Use echtzeitmusik Berlin
 
+> First time? See [INSTALL.md](./INSTALL.md) to install the extension.
+
 ## Popup — Browse Concerts
 
 Click the extension icon (![icon](icons/icon16.png)) to open the popup.

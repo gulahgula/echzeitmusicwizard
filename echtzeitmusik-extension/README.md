@@ -15,12 +15,9 @@ Explore Berlin's experimental music calendar from [echtzeitmusik.de](https://ech
 
 See [HOWTO.md](./HOWTO.md) for a full walkthrough of the popup, analysis page, notifications, and tips.
 
-## Install (Developer Mode)
+## Install
 
-1. Open `chrome://extensions`
-2. Enable **Developer mode**
-3. Click **Load unpacked** and select the `echtzeitmusik-extension/` folder
-4. Click the extension icon to browse concerts
+See [INSTALL.md](./INSTALL.md) for Chrome Web Store and manual installation instructions.
 
 ## Privacy
 
