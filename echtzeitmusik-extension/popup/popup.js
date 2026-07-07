@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ev.infoHTML) {
         const infoDiv2 = document.createElement('div');
         infoDiv2.className = 'event-desc';
-        infoDiv2.innerHTML = ev.infoHTML;
+        renderSanitizedHtml(infoDiv2, ev.infoHTML);
         div.appendChild(infoDiv2);
       }
 
@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const isDay = filter === 'today' || filter === 'tomorrow';
       const artistConcerts = {};
       events.forEach(ev => {
-        const matchNames = watchedArtists.filter(a => ev.infoText.toLowerCase().includes(a.toLowerCase()));
+        const matchNames = watchedArtists.filter(a => matchesArtist(ev.infoText, a));
         matchNames.forEach(a => {
           const norm = a.trim().replace(/[:;,.\s]+$/, '').replace(/\s+/g, ' ');
           if (!artistConcerts[norm]) artistConcerts[norm] = [];
@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Watch toggle ──
 
-  function toggleWatchArtist(name, btn, nameSpan) {
+  async function toggleWatchArtist(name, btn, nameSpan) {
     name = normalizeArtistName(name);
     const idx = watchedArtists.indexOf(name);
     if (idx === -1) {
@@ -432,7 +432,19 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Following';
       btn.classList.add('followed');
       if (nameSpan) { nameSpan.textContent = `✓ ${name}`; nameSpan.classList.add('followed'); }
-      chrome.runtime.sendMessage({ action: 'artistFollowed', name }).catch(() => {});
+      showPopupToast(`✓ Following ${name}`);
+      const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+      const tabId = tabs[0]?.id;
+      try {
+        const response = await chrome.runtime.sendMessage({ action: 'artistFollowed', name });
+        if (response?.upcoming > 0 && tabId) {
+          chrome.scripting.executeScript({
+            target: { tabId },
+            func: injectPageToast,
+            args: [response.artistName, `${response.eventInfo} (in ${response.label})`],
+          }).catch(() => {});
+        }
+      } catch (e) {}
     } else {
       watchedArtists.splice(idx, 1);
       btn.textContent = '+ Follow';
@@ -474,6 +486,55 @@ document.addEventListener('DOMContentLoaded', () => {
     errorEl.classList.remove('hidden');
   }
 
+  // ── In-popup toast (follow confirmations + notification banners) ──
+
+  function showPopupToast(text) {
+    let container = document.getElementById('popup-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'popup-toast-container';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = 'popup-toast';
+    toast.textContent = text;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  }
+
+  // Injected into the active tab by scripting.executeScript — self-contained
+  function injectPageToast(artist, info) {
+    let c = document.getElementById('ech-toast-container');
+    if (!c) { c = document.createElement('div'); c.id = 'ech-toast-container';
+      c.style.cssText = 'all:initial;position:fixed;bottom:16px;right:16px;z-index:2147483647;display:flex;flex-direction:column-reverse;gap:8px;';
+      document.body.appendChild(c); }
+    const host = document.createElement('div'); host.style.cssText = 'all:initial;';
+    const s = host.attachShadow({ mode: 'closed' });
+    s.innerHTML = `<style>
+*{margin:0;padding:0;box-sizing:border-box}
+.t{background:#1e1e0a;border:1px solid #4a4a1a;border-left:3px solid #ffd54f;border-radius:6px;
+padding:10px 14px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;
+color:#e0e0e0;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,0.4);display:flex;align-items:flex-start;gap:8px;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.i{flex:1;min-width:0}
+.a{font-weight:700;color:#ffd54f}
+.d{color:#bbb;margin-top:2px}
+.x{flex-shrink:0;background:none;border:none;color:#666;cursor:pointer;font-size:16px;padding:2px;line-height:1}
+.x:hover{color:#e57373}
+</style><div class="t"><div class="i"><div class="a">${artist.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div><div class="d">${info.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div></div><button class="x">✕</button></div>`;
+    const toast = s.querySelector('.t');
+    s.querySelector('.x').onclick = () => host.remove();
+    c.appendChild(host);
+    setTimeout(() => { if (host.parentNode) host.remove(); }, 8000);
+  }
+
+  // Background broadcasts for alarm-triggered notifications
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.action === 'showToast') {
+      showPopupToast(`🔔 ${msg.artistName} — ${msg.eventInfo}`);
+    }
+  });
+
   // ── Notifications tab ──
 
   function renderNotifications() {
@@ -482,32 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('overview').classList.add('hidden');
     eventList.innerHTML = '';
 
-    // ── Settings: notification mode ──
-    chrome.storage.local.get(['notifMode', 'unreadNotifications'], (result) => {
-      const mode = result.notifMode || 'silent';
-      const list = result.unreadNotifications || [];
-
-      const settings = document.createElement('div');
-      settings.className = 'notif-settings';
-      settings.innerHTML = '<span class="notif-settings-label">🔔 Toast</span>';
-      ['off', 'silent'].forEach(val => {
-        const label = document.createElement('label');
-        label.className = 'notif-mode-label';
-        const radio = document.createElement('input');
-        radio.type = 'radio';
-        radio.name = 'notifMode';
-        radio.value = val;
-        if (val === mode || (!mode && val === 'silent')) radio.checked = true;
-        radio.addEventListener('change', () => {
-          if (radio.checked) {
-            chrome.storage.local.set({ notifMode: val });
-          }
-        });
-        label.appendChild(radio);
-        label.appendChild(document.createTextNode(val === 'off' ? 'Off' : 'Silent'));
-        settings.appendChild(label);
-      });
-      eventList.appendChild(settings);
+    chrome.storage.local.get('unreadNotifications', (result) => {
+      // Hide notifications for events that already happened (background prunes them on its next check)
+      const list = (result.unreadNotifications || []).filter(n => !n.eventTs || n.eventTs > Date.now());
 
       if (list.length === 0) {
         const empty = document.createElement('div');
@@ -537,7 +575,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const detailEl = document.createElement('div');
         detailEl.className = 'notif-list-detail';
-        detailEl.textContent = n.eventInfo;
+        // Countdown computed at render time so it never goes stale
+        detailEl.textContent = n.eventTs
+          ? `${n.eventInfo} (in ${formatLead(n.eventTs - Date.now())})`
+          : n.eventInfo;
         infoDiv.appendChild(detailEl);
 
         if (n.address) {

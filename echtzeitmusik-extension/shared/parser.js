@@ -219,3 +219,50 @@ function downloadICS(event) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+// Render untrusted HTML (fetched from echtzeitmusik.de) into `target`,
+// keeping only harmless formatting tags and http(s) links.
+function renderSanitizedHtml(target, html) {
+  const ALLOWED = new Set(['BR', 'B', 'I', 'EM', 'STRONG', 'U', 'P', 'SPAN', 'A']);
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  (function walk(src, dst) {
+    for (const node of src.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        dst.appendChild(document.createTextNode(node.nodeValue));
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (ALLOWED.has(node.tagName)) {
+          const el = document.createElement(node.tagName.toLowerCase());
+          if (node.tagName === 'A') {
+            let href = node.getAttribute('href') || '';
+            if (href.startsWith('/')) href = 'https://echtzeitmusik.de' + href;
+            if (/^https?:\/\//i.test(href)) {
+              el.setAttribute('href', href);
+              el.setAttribute('target', '_blank');
+              el.setAttribute('rel', 'noopener noreferrer');
+            }
+          }
+          dst.appendChild(el);
+          walk(node, el);
+        } else {
+          walk(node, dst); // drop the tag, keep its text content
+        }
+      }
+    }
+  })(doc.body, target);
+}
+
+// Word-boundary artist match (accent-insensitive) — avoids "Anna" matching "Annabelle"
+function matchesArtist(infoText, artistName) {
+  const strip = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const name = strip(artistName).trim();
+  if (!name) return false;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}($|[^\\p{L}\\p{N}])`, 'iu').test(strip(infoText));
+}
+
+// Human-readable lead time, e.g. "1 hour", "3 days"
+function formatLead(diffMs) {
+  const hours = Math.max(1, Math.round(diffMs / 3600000));
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'}`;
+  const days = Math.round(hours / 24);
+  return `${days} day${days === 1 ? '' : 's'}`;
+}

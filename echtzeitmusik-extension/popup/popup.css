@@ -462,35 +462,30 @@ footer a#open-settings { color: #81d4fa; font-weight: 600; }
   margin-top: 4px;
 }
 
-/* ── Notifications settings ── */
-
-.notif-settings {
+/* ── In-popup toasts ── */
+#popup-toast-container {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 1000;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  margin-bottom: 8px;
-  background: #141414;
-  border: 1px solid #222;
+  flex-direction: column-reverse;
+  gap: 6px;
+  pointer-events: none;
+}
+.popup-toast {
+  background: #1e1e0a;
+  border: 1px solid #4a4a1a;
+  border-left: 3px solid #ffd54f;
   border-radius: 6px;
-  font-size: 13px;
-}
-
-.notif-settings-label {
-  color: #888;
+  padding: 8px 12px;
   font-size: 12px;
-  margin-right: 4px;
+  color: #e0e0e0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  animation: toast-in .25s ease;
 }
-
-.notif-mode-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: #bbb;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.notif-mode-label input[type="radio"] {
-  accent-color: #ffd54f;
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }

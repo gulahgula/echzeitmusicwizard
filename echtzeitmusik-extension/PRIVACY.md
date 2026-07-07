@@ -17,7 +17,11 @@ All data is stored locally on your device using the `chrome.storage.local` API:
 
 ## Network Access
 
-The extension fetches the public concert calendar from `https://echtzeitmusik.de/index.php?page=calendar`. No other network requests are made. The content script operates on all URLs (`<all_urls>`) solely to render toast notifications; no page data is read or transmitted.
+The extension fetches the public concert calendar from `https://echtzeitmusik.de/index.php?page=calendar`. No other network requests are made. The extension does not read any content from web pages you visit.
+
+## Notifications
+
+With your notification setting enabled, the extension informs you about upcoming concerts of artists you follow via the browser's native notification system. All notification content is generated locally from the public calendar data — no data is sent to any server.
 
 ## Third Parties
 

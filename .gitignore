@@ -2,3 +2,5 @@ node_modules/
 .DS_Store
 *.log
 *.zip
+store-assets/
+echtzeitmusik-berlin-v*/

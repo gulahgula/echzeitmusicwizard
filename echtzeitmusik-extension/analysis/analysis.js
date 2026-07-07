@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (isFollowing && watchedArtists.length > 0) {
         events = allParseEvents.filter(ev =>
-          watchedArtists.some(a => ev.infoText.toLowerCase().includes(a.trim().toLowerCase()))
+          watchedArtists.some(a => matchesArtist(ev.infoText, a))
         );
         artistMap = buildArtistMap(events);
         const filteredMap = {};
@@ -1137,7 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const d = parseEventDateTime(ev.dateStr, ev.time);
       if (!d) return false;
       if (d.getFullYear() !== year || d.getMonth() !== month) return false;
-      return watchedArtists.some(a => ev.infoText.toLowerCase().includes(a.toLowerCase()));
+      return watchedArtists.some(a => matchesArtist(ev.infoText, a));
     });
 
     calEvents.sort((a, b) => {
@@ -1194,7 +1194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="cal-day-marker has-events">${day}</div>
         <div class="cal-day-header">${monthName} ${day} · ${weekday}</div>`;
       evs.forEach(ev => {
-        const artists = watchedArtists.filter(a => ev.infoText.toLowerCase().includes(a.toLowerCase()));
+        const artists = watchedArtists.filter(a => matchesArtist(ev.infoText, a));
         const artistStr = artists.map(escapeHtml).join(', ');
         html += `<div class="cal-event">
           <span class="cal-event-time">${ev.time}</span>

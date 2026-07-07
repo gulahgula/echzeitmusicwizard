@@ -1,11 +1,13 @@
 {
   "manifest_version": 3,
   "name": "echtzeitmusik Berlin",
-  "version": "1.3.0",
+  "version": "2.1.0",
   "description": "Berlin experimental music calendar watcher — explore concerts from echtzeitmusik.de, follow artists, get notified before shows.",
   "permissions": [
     "storage",
-    "alarms"
+    "alarms",
+    "activeTab",
+    "scripting"
   ],
   "host_permissions": [
     "https://echtzeitmusik.de/*"
@@ -13,11 +15,6 @@
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [{
-    "matches": ["<all_urls>"],
-    "js": ["content.js"],
-    "run_at": "document_idle"
-  }],
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "echtzeitmusik",

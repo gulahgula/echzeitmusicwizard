@@ -2,20 +2,27 @@ const CALENDAR_URL = 'https://echtzeitmusik.de/index.php?page=calendar&filter=mo
 
 chrome.runtime.onStartup.addListener(() => {
   chrome.alarms.create('checkCalendar', { periodInMinutes: 60 });
+  checkAllArtists();
 });
 
 chrome.alarms.onAlarm.addListener(() => checkAllArtists());
 
 // ── Follow artist: check for upcoming, store notification, update badge ──
 
+let pendingFollow = false;
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === 'artistFollowed') {
-    checkArtistNow(msg.name).then(sendResponse).catch(() => sendResponse({ ok: false }));
+    pendingFollow = true;
+    checkArtistNow(msg.name, { skipToast: true }).then(r => {
+      pendingFollow = false;
+      sendResponse(r);
+    }).catch(() => { pendingFollow = false; sendResponse({ ok: false }); });
     return true;
   }
 });
 
-async function checkArtistNow(artistName) {
+async function checkArtistNow(artistName, { skipToast = false } = {}) {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 10000);
@@ -29,22 +36,22 @@ async function checkArtistNow(artistName) {
 
     const upcoming = events
       .filter(ev => {
-        if (!ev.infoText.toLowerCase().includes(artistName.toLowerCase())) return false;
+        if (!matchesArtist(ev.infoText, artistName)) return false;
         const d = parseEventDateTime(ev.dateStr, ev.time);
         return d && d > now;
       })
       .sort((a, b) => parseEventDateTime(a.dateStr, a.time) - parseEventDateTime(b.dateStr, b.time));
 
-    if (upcoming.length > 0) {
-      const ev = upcoming[0];
-      const diffMs = parseEventDateTime(ev.dateStr, ev.time).getTime() - now.getTime();
-      const hours = Math.round(diffMs / (1000 * 60 * 60));
-      const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
-      const label = days >= 1 ? `${days} days` : `${hours} hours`;
-      storeNotification(artistName, ev, label);
-    }
-    updateBadge();
-    return { ok: true, upcoming: upcoming.length };
+      if (upcoming.length > 0) {
+        const ev = upcoming[0];
+        const eventDate = parseEventDateTime(ev.dateStr, ev.time);
+        storeNotification(artistName, ev, eventDate, skipToast);
+        const evInfo = `${ev.dayOfWeek} ${ev.displayDate || ev.dateStr} · ${ev.time} at ${ev.venueName}`;
+        const label = formatLead(eventDate.getTime() - Date.now());
+        return { ok: true, upcoming: upcoming.length, artistName, eventInfo: evInfo, label };
+      }
+      updateBadge();
+      return { ok: true, upcoming: 0 };
   } catch (e) {
     return { ok: false };
   }
@@ -55,6 +62,7 @@ async function checkArtistNow(artistName) {
 let checkTimer = null;
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.watchedArtists) {
+    if (pendingFollow) return;
     clearTimeout(checkTimer);
     checkTimer = setTimeout(() => checkAllArtists(), 500);
   }
@@ -64,7 +72,6 @@ async function checkAllArtists() {
   const { watchedArtists = [] } = await chrome.storage.local.get('watchedArtists');
   if (watchedArtists.length === 0) { updateBadge(); return; }
 
-  // Deduplicate and normalize, then persist cleanup
   const deduped = [...new Set(watchedArtists.map(a => a.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/[:;,.\s]+$/, '').replace(/\s+/g, ' ')))];
   if (deduped.length !== watchedArtists.length || deduped.join(',') !== watchedArtists.join(',')) {
     await chrome.storage.local.set({ watchedArtists: deduped });
@@ -82,7 +89,7 @@ async function checkAllArtists() {
     for (const name of normalized) {
       const upcoming = events
         .filter(ev => {
-          if (!ev.infoText.toLowerCase().includes(name.toLowerCase())) return false;
+          if (!matchesArtist(ev.infoText, name)) return false;
           const d = parseEventDateTime(ev.dateStr, ev.time);
           return d && d > now;
         })
@@ -90,46 +97,48 @@ async function checkAllArtists() {
 
       if (upcoming.length > 0) {
         const ev = upcoming[0];
-        const diffMs = parseEventDateTime(ev.dateStr, ev.time).getTime() - now.getTime();
-        const hours = Math.round(diffMs / (1000 * 60 * 60));
-        const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
-        const label = days >= 1 ? `${days} days` : `${hours} hours`;
-        storeNotification(name, ev, label);
+        storeNotification(name, ev, parseEventDateTime(ev.dateStr, ev.time));
       }
     }
 
     updateBadge();
   } catch (e) {
-    // Silently handle fetch/parse errors
   }
 }
 
 // ── Storage + badge ──
 
-function storeNotification(artistName, ev, label) {
+function storeNotification(artistName, ev, eventDate, skipToast = false) {
   const id = `ech-${artistName.replace(/[^a-zA-Z0-9]/g, '')}-${ev.id.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const info = `${ev.dayOfWeek} ${ev.displayDate || ev.dateStr} · ${ev.time} at ${ev.venueName} (in ${label})`;
+  const eventTs = eventDate.getTime();
+  const info = `${ev.dayOfWeek} ${ev.displayDate || ev.dateStr} · ${ev.time} at ${ev.venueName}`;
+  const label = formatLead(eventTs - Date.now());
 
-  chrome.storage.local.get(['unreadNotifications'], (result) => {
+  chrome.storage.local.get(['unreadNotifications', 'dismissedNotifIds'], (result) => {
     const list = result.unreadNotifications || [];
-    const dup = list.some(n => n.artistName === artistName && n.eventInfo === info);
-    if (dup) return;
-    list.unshift({ id, artistName, eventInfo: info, address: ev.address || '', timestamp: Date.now() });
+    if (list.some(n => n.id === id)) return;
+    if ((result.dismissedNotifIds || []).includes(id)) return;
+    list.unshift({ id, artistName, eventInfo: info, eventTs, address: ev.address || '', timestamp: Date.now() });
     chrome.storage.local.set({ unreadNotifications: list });
+    updateBadge();
 
-    // Send toast to the active tab — reaches content.js on web pages AND analysis.js on extension pages
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: 'showToast', artistName, eventInfo: info, notifId: id })
-          .catch(() => {});
-      }
-    });
+    // Popup follow: skipToast is true — the popup handles the on-page toast
+    // itself from the artistFollowed response. Don't send anything else.
+    if (skipToast) return;
+
+    // Alarm / onChanged: no popup involved — broadcast to extension pages.
+    chrome.runtime.sendMessage({ action: 'showToast', artistName, eventInfo: `${info} (in ${label})`, notifId: id })
+      .catch(() => {});
   });
 }
 
 function updateBadge() {
   chrome.storage.local.get(['unreadNotifications'], (result) => {
-    const list = result.unreadNotifications || [];
+    const stored = result.unreadNotifications || [];
+    const list = stored.filter(n => !n.eventTs || n.eventTs > Date.now());
+    if (list.length !== stored.length) {
+      chrome.storage.local.set({ unreadNotifications: list });
+    }
     const count = list.length;
     if (count > 0) {
       chrome.action.setBadgeText({ text: String(count) });
@@ -147,6 +156,22 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // ── Helpers ──
+// matchesArtist/formatLead mirror shared/parser.js (service worker can't share page scripts)
+
+function matchesArtist(infoText, artistName) {
+  const strip = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const name = strip(artistName).trim();
+  if (!name) return false;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}($|[^\\p{L}\\p{N}])`, 'iu').test(strip(infoText));
+}
+
+function formatLead(diffMs) {
+  const hours = Math.max(1, Math.round(diffMs / 3600000));
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'}`;
+  const days = Math.round(hours / 24);
+  return `${days} day${days === 1 ? '' : 's'}`;
+}
 
 function parseEventDateTime(dateStr, time) {
   const parts = dateStr.replace(/\.\s*/g, '.').split('.').filter(Boolean);
