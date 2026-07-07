@@ -391,6 +391,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const hStrip = rawLine.match(/^(?:set\s+\d+\s*:|duo\s*:|solo\s*:|trio\s*:|-set\s+\d+\s*-)\s*(.+)$/i);
       const line = hStrip ? hStrip[1].trim() : rawLine;
       if (!line) continue;
+      // Names inside parentheses — extract before structured patterns
+      const inner = extractNamesFromParens(line);
+      if (inner) { inner.forEach(n => names.add(n)); continue; }
       // Name - instrument
       let m = line.match(/^(.+?)\s+[-–—]\s+(.+)$/);
       if (m) { const n = m[1].trim(); if (looksLikePersonName(n)) names.add(n); continue; }

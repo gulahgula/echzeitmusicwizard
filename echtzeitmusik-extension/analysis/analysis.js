@@ -432,20 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Extract names from inside parentheses when outer text isn't a person name
   // e.g. "Project VO (Antti Virtaranta & Rieko Okuda)" → ["Antti Virtaranta", "Rieko Okuda"]
-  function extractNamesFromParens(line) {
-    const results = [];
-    const regex = /\(([^)]+)\)/g;
-    let m;
-    while ((m = regex.exec(line)) !== null) {
-      const inner = m[1];
-      const parts = inner.split(/[&,;]\s*/);
-      for (const part of parts) {
-        const trimmed = part.trim();
-        if (looksLikePersonName(trimmed)) results.push(trimmed);
-      }
-    }
-    return results.length > 0 ? results : null;
-  }
+  // (extractNamesFromParens lives in shared/parser.js)
 
   // Split a line on known separators to find multiple names
   function splitNames(line) {

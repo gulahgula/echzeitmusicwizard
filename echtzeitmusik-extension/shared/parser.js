@@ -170,6 +170,23 @@ function looksLikePersonName(s) {
   return true;
 }
 
+// Extract person names from inside parentheses, split by & , ;
+// e.g. "Project (Antti Virtaranta & Rieko Okuda)" → ["Antti Virtaranta", "Rieko Okuda"]
+function extractNamesFromParens(line) {
+  const results = [];
+  const regex = /\(([^)]+)\)/g;
+  let m;
+  while ((m = regex.exec(line)) !== null) {
+    const inner = m[1];
+    const parts = inner.split(/[&,;]\s*/);
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (looksLikePersonName(trimmed)) results.push(trimmed);
+    }
+  }
+  return results.length > 0 ? results : null;
+}
+
 function parseEventDateTime(dateStr, time) {
   const parts = dateStr.replace(/\.\s*/g, '.').split('.').filter(Boolean);
   if (parts.length < 3) return null;
