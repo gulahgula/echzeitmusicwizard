@@ -1,0 +1,382 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --bg-surface: #1a1a1a;
+  --border: #1e1e1e;
+  --border-light: #2a2a2a;
+  --text: #e0e0e0;
+  --text-body: #ccc;
+  --text-muted: #888;
+  --text-dim: #666;
+  --amber: #ffd54f;
+  --blue: #81d4fa;
+  --green: #66bb6a;
+  --red: #e57373;
+  --orange: #ff9800;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #0a0a0a;
+  color: #e8e8e8;
+  min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(180deg, #161616 0%, #111 100%);
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid #222;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffd54f;
+}
+
+.back-link {
+  font-size: 13px;
+  color: #81d4fa;
+  text-decoration: none;
+}
+
+.back-link:hover { text-decoration: underline; }
+
+main {
+  padding: 20px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ── Panels ── */
+
+.panel {
+  background: #141414;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+
+.panel h2 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
+
+/* ── Stat grid ── */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.stat-card {
+  background: #0e0e0e;
+  border: 1px solid #1a1a1a;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffd54f;
+  line-height: 1.2;
+}
+
+.stat-card .stat-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* ── Quality issues ── */
+
+.quality-group {
+  margin-bottom: 16px;
+}
+
+.quality-group h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #bbb;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quality-group h3 .badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.badge-red { background: rgba(229,115,115,0.15); color: #e57373; }
+.badge-orange { background: rgba(255,152,0,0.15); color: #ff9800; }
+.badge-green { background: rgba(102,187,106,0.15); color: #66bb6a; }
+.badge-blue { background: rgba(129,212,250,0.15); color: #81d4fa; }
+
+.quality-list {
+  list-style: none;
+}
+
+.quality-list li {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #aaa;
+  border-bottom: 1px solid #1a1a1a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quality-list li:last-child { border-bottom: none; }
+
+.quality-list .artist-name {
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.quality-list .issue-desc {
+  color: #888;
+  font-size: 11px;
+}
+
+/* ── Charts ── */
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar-label {
+  flex: 0 0 140px;
+  font-size: 12px;
+  color: #ccc;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-track {
+  flex: 1;
+  height: 18px;
+  background: #0e0e0e;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.bar-fill.amber { background: linear-gradient(90deg, #ffd54f, #ffab00); }
+.bar-fill.blue { background: linear-gradient(90deg, #81d4fa, #4fc3f7); }
+.bar-fill.green { background: linear-gradient(90deg, #66bb6a, #43a047); }
+
+.bar-value {
+  flex: 0 0 36px;
+  font-size: 11px;
+  color: #888;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ── Timeline ── */
+
+.timeline-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.timeline-row:last-child { border-bottom: none; }
+
+.timeline-year {
+  flex: 0 0 50px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffd54f;
+}
+
+.timeline-bar {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  height: 20px;
+}
+
+.timeline-month {
+  flex: 1;
+  border-radius: 2px;
+  background: #0e0e0e;
+  position: relative;
+}
+
+.timeline-month.active {
+  background: #ffd54f;
+}
+
+.timeline-month.current {
+  background: #66bb6a;
+}
+
+.timeline-stats {
+  flex: 0 0 120px;
+  font-size: 11px;
+  color: #888;
+  text-align: right;
+}
+
+/* ── Collab list ── */
+
+.collab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.collab-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: #0e0e0e;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.collab-row .names {
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.collab-row .count {
+  color: #888;
+  font-size: 12px;
+}
+
+/* ── Followed ── */
+
+.followed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.followed-card {
+  background: #0e0e0e;
+  border: 1px solid #1a1a1a;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.followed-card .name {
+  font-weight: 600;
+  color: #66bb6a;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.followed-card .detail {
+  font-size: 11px;
+  color: #888;
+}
+
+/* ── Export ── */
+
+.export-btn {
+  background: linear-gradient(135deg, #81d4fa 0%, #4fc3f7 100%);
+  color: #0a0a0a;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.export-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(129,212,250,0.25);
+}
+
+/* ── States ── */
+
+.hidden { display: none !important; }
+
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+.empty-state h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.6;
+}
+
+.empty-state a { color: #81d4fa; text-decoration: none; }
+.empty-state a:hover { text-decoration: underline; }
+
+.loading-text {
+  text-align: center;
+  padding: 60px 24px;
+  color: #555;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}

@@ -478,6 +478,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('fetch-github').addEventListener('click', fetchFromGitHub);
   document.getElementById('refresh-github').addEventListener('click', fetchFromGitHub);
   document.getElementById('export-data').addEventListener('click', exportData);
+  document.getElementById('open-analysis').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = chrome.runtime.getURL('data-analysis/analysis.html');
+  });
 
   searchInput.addEventListener('input', applyFilters);
   filterInstrument.addEventListener('change', applyFilters);

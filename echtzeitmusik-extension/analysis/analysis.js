@@ -125,6 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.tabs.create({ url: chrome.runtime.getURL('about/about.html') });
   });
 
+  document.getElementById('open-data-analysis').addEventListener('click', e => {
+    e.preventDefault();
+    chrome.tabs.create({ url: chrome.runtime.getURL('data-analysis/analysis.html') });
+  });
+
   async function loadAndAnalyze(filter) {
     loading.classList.remove('hidden');
     errorEl.classList.add('hidden');

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ech analysis · Data Quality & Insights</title>
+  <link rel="stylesheet" href="analysis.css">
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>⚡ ech data analysis</h1>
+      <a href="#" id="back-link" class="back-link">← Back to Catalogue</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state">
+      <div class="empty-icon">📊</div>
+      <h2>No data to analyse</h2>
+      <p>The artist catalogue is empty. Browse concerts or fetch from GitHub first, then return here to analyse data quality and patterns.</p>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="hidden">
+      <div class="loading-text">Analysing data…</div>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="hidden">
+
+      <!-- Overview stats -->
+      <section class="panel">
+        <h2>Overview</h2>
+        <div id="overview-stats" class="stat-grid"></div>
+      </section>
+
+      <!-- Data Quality -->
+      <section class="panel">
+        <h2>Data Quality</h2>
+        <div id="quality-issues"></div>
+      </section>
+
+      <!-- Instruments distribution -->
+      <section class="panel">
+        <h2>Instruments</h2>
+        <div id="instruments-chart"></div>
+      </section>
+
+      <!-- Venues distribution -->
+      <section class="panel">
+        <h2>Venues</h2>
+        <div id="venues-chart"></div>
+      </section>
+
+      <!-- Activity timeline -->
+      <section class="panel">
+        <h2>Activity Timeline</h2>
+        <div id="activity-timeline"></div>
+      </section>
+
+      <!-- Collaboration network -->
+      <section class="panel">
+        <h2>Collaboration Patterns</h2>
+        <div id="collab-network"></div>
+      </section>
+
+      <!-- Followed artists -->
+      <section class="panel">
+        <h2>Followed Artists</h2>
+        <div id="followed-stats"></div>
+      </section>
+
+      <!-- Export -->
+      <section class="panel">
+        <h2>Export</h2>
+        <div id="export-options"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="../shared/parser.js"></script>
+  <script src="../shared/catalogue-db.js"></script>
+  <script src="analysis.js"></script>
+</body>
+</html>
