@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       applyFilters();
     }
 
-    footerStats.textContent = `${allArtists.length} artists in local catalogue`;
+    footerStats.textContent = `${allArtists.length} artists ever seen`;
   }
 
   // ── Sync banner ──
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     syncBanner.innerHTML = `
       Community data from GitHub: <strong>${date}</strong> · ${info.artistCount || allArtists.length} artists.
-      Events since then are collected automatically.
+      All artists ever seen — this list accumulates as you browse concerts.
       <a class="refresh-link" id="banner-refresh">Refresh from GitHub</a>
     `;
     syncBanner.classList.remove('hidden');

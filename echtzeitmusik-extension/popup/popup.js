@@ -255,6 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const hasFollowed = watchedArtists.some(a => matchesArtist(ev.infoText, a));
       if (hasFollowed) div.classList.add('event-has-followed');
 
+      // Extract artists for tag rendering (used below)
+      const artists = extractArtistsBasic(ev.infoText);
+
       // "NOW" indicator: 30 min before concert start
       const evStart = parseEventDateTime(ev.dateStr, ev.time);
       if (evStart) {
