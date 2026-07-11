@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ech catalogue · Artist Database</title>
+  <link rel="stylesheet" href="catalogue.css">
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>⚡ ech catalogue</h1>
+    </div>
+    <div id="sync-banner" class="hidden"></div>
+    <div class="controls">
+      <input type="text" id="search" placeholder="Search artists, instruments, venues…" autocomplete="off">
+      <div class="filter-row">
+        <select id="filter-instrument"><option value="">All instruments</option></select>
+        <select id="filter-venue"><option value="">All venues</option></select>
+        <select id="filter-genre"><option value="">All genres</option></select>
+        <select id="filter-tag"><option value="">All tags</option></select>
+        <select id="sort">
+          <option value="activity">Most active</option>
+          <option value="name">Name A-Z</option>
+          <option value="recent">Recently seen</option>
+          <option value="venues">Most venues</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state">
+      <div class="empty-icon">⚡</div>
+      <h2>No artist catalogue loaded yet</h2>
+      <p>The extension automatically collects artist data as you browse concerts. For a head start, fetch the community database from GitHub — artist profiles collected from <a href="https://echtzeitmusik.de" target="_blank">echtzeitmusik.de</a> since September 2022.</p>
+      <button id="fetch-github" class="primary-btn">Fetch from GitHub</button>
+      <p class="empty-hint">After fetching, the catalogue grows automatically with every concert you view.</p>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loading" class="hidden">
+      <div class="loading-text">Loading…</div>
+      <div class="loading-bar"><div class="loading-fill"></div></div>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="hidden">
+      <div id="result-count" class="result-count"></div>
+      <div id="artist-list"></div>
+    </div>
+
+    <!-- Artist detail overlay -->
+    <div id="detail-overlay" class="hidden">
+      <div class="detail-panel">
+        <button id="detail-close" class="detail-close">&times;</button>
+        <div id="detail-content"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span id="footer-stats"></span>
+    <span>
+      <button id="refresh-github" class="link-btn">Refresh from GitHub</button>
+      · <button id="export-data" class="link-btn">Export</button>
+    </span>
+  </footer>
+
+  <script src="../shared/parser.js"></script>
+  <script src="../shared/catalogue-db.js"></script>
+  <script src="catalogue.js"></script>
+</body>
+</html>

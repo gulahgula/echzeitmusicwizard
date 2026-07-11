@@ -66,6 +66,26 @@ header {
   box-shadow: 0 3px 10px rgba(255, 213, 79, 0.25);
 }
 
+.catalogue-link {
+  display: block;
+  text-align: center;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #81d4fa;
+  text-decoration: none;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  margin-top: 4px;
+  transition: all 0.15s;
+}
+
+.catalogue-link:hover {
+  background: #81d4fa;
+  color: #0a0a0a;
+  transform: translateY(-1px);
+}
+
 .filter-bar { display: flex; gap: 4px; }
 
 .filter-bar button {
@@ -488,4 +508,57 @@ footer a#open-settings { color: #81d4fa; font-weight: 600; }
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Music search links ── */
+
+.music-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+}
+
+.search-icon {
+  font-size: 10px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+  padding: 1px 2px;
+}
+
+.artist-tag:hover .search-icon { opacity: 0.8; }
+.search-icon:hover { opacity: 1 !important; }
+
+.search-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 3px;
+  gap: 2px;
+  z-index: 50;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.artist-tag:hover .search-menu { display: flex; }
+
+.search-menu a {
+  font-size: 9px;
+  color: #888;
+  text-decoration: none;
+  padding: 2px 5px;
+  border-radius: 3px;
+  transition: all 0.1s;
+  font-weight: 600;
+}
+
+.search-menu a:hover {
+  background: #2a2a2a;
+  color: #e0e0e0;
 }

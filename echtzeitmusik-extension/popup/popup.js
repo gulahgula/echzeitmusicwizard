@@ -11,24 +11,23 @@ document.addEventListener('DOMContentLoaded', () => {
   function getCached(url) { const e = responseCache[url]; return e && (Date.now() - e.t < 3e5) ? e.d : null; }
   function setCache(url, d) { responseCache[url] = { d, t: Date.now() }; }
 
-  chrome.storage.local.get(['watchedArtists'], (result) => {
+  async function initPopup() {
+    const result = await chrome.storage.local.get(['watchedArtists']);
     watchedArtists = [...new Set((result.watchedArtists || []).map(n => normalizeArtistName(n)))];
     if (watchedArtists.join(',') !== (result.watchedArtists || []).join(',')) {
       chrome.storage.local.set({ watchedArtists });
     }
-    if (loadedEvents.length > 0) {
-      renderOverview(loadedEvents, currentFilter);
-      refreshFollowedBars();
-      refreshNowBars();
-    }
-  });
+    loadConcerts(currentFilter);
+  }
 
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.watchedArtists) {
       watchedArtists = changes.watchedArtists.newValue || [];
       if (loadedEvents.length > 0) {
         renderOverview(loadedEvents, currentFilter);
+        renderEvents(loadedEvents, currentFilter);
         refreshFollowedBars();
+        refreshNowBars();
       }
     }
   });
@@ -54,6 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('open-analysis').addEventListener('click', e => {
     e.preventDefault();
     chrome.tabs.create({ url: chrome.runtime.getURL('analysis/analysis.html') + '#today' });
+  });
+
+  document.getElementById('open-catalogue').addEventListener('click', e => {
+    e.preventDefault();
+    chrome.tabs.create({ url: chrome.runtime.getURL('catalogue/catalogue.html') });
   });
 
   document.getElementById('open-about').addEventListener('click', e => {
@@ -84,6 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderEvents(loadedEvents, filter);
       if (watchedArtists.length > 0) refreshFollowedBars();
       refreshNowBars();
+      // Auto-collect artist data into catalogue
+      collectArtistsFromEvents(loadedEvents);
     } catch (err) {
       showError('Failed to load: ' + err.message);
     } finally {
@@ -167,8 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.event').forEach(card => {
       const ev = loadedEvents.find(e => e.dateStr === card.dataset.date && e.time === card.dataset.time);
       if (!ev) return;
-      const artists = extractArtistsBasic(ev.infoText);
-      const has = artists.some(n => watchedArtists.includes(normalizeArtistName(n)));
+      const has = watchedArtists.some(a => matchesArtist(ev.infoText, a));
       card.classList.toggle('event-has-followed', has);
     });
   }
@@ -247,8 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
       div.appendChild(addrDiv);
 
       // Check if any followed artist is in this event
-      const artists = extractArtistsBasic(ev.infoText);
-      const hasFollowed = artists.some(n => watchedArtists.includes(normalizeArtistName(n)));
+      const hasFollowed = watchedArtists.some(a => matchesArtist(ev.infoText, a));
       if (hasFollowed) div.classList.add('event-has-followed');
 
       // "NOW" indicator: 30 min before concert start
@@ -288,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleWatchArtist(name, btn, nameSpan);
           });
           tag.appendChild(btn);
+          tag.appendChild(createMusicSearchLinks(name));
           artistRow.appendChild(tag);
         });
         div.appendChild(artistRow);
@@ -452,11 +457,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (nameSpan) { nameSpan.textContent = name; nameSpan.classList.remove('followed'); }
     }
     chrome.storage.local.set({ watchedArtists });
-    // Update followed indicators on all visible events
-    document.querySelectorAll('.event-has-followed').forEach(el => {
-      const has = [...el.querySelectorAll('.artist-name.followed')].length > 0;
-      el.classList.toggle('event-has-followed', has);
-    });
   }
 
   // ── ICS download (shared in shared/parser.js) ──
@@ -614,5 +614,73 @@ color:#e0e0e0;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,0.4);display:flex
     });
   }
 
-  loadConcerts(currentFilter);
+  // ── Auto-collect artist data from parsed events ──
+
+  async function collectArtistsFromEvents(events) {
+    if (typeof CatalogueDB === 'undefined') return;
+    try {
+      await CatalogueDB.init();
+      for (const ev of events) {
+        const artists = extractArtistsBasic(ev.infoText);
+        const collaborators = artists.map(a => normalizeArtistName(a)).filter(Boolean);
+        for (const name of artists) {
+          const instruments = extractInstrumentsFromLine(name, ev.infoText);
+          await CatalogueDB.upsertFromEvent({
+            name,
+            instruments,
+            venue: { name: ev.venueName, city: '' },
+            date: normalizeEventDate(ev.dateStr),
+            time: ev.time,
+            address: ev.address,
+            description: ev.infoText,
+            collaborators: collaborators.filter(c => c !== normalizeArtistName(name)),
+          });
+        }
+      }
+    } catch (e) {
+      // Silently fail — auto-collect is best-effort
+    }
+  }
+
+  function extractInstrumentsFromLine(artistName, infoText) {
+    const lines = infoText.split(/\n/).map(l => l.trim()).filter(Boolean);
+    const name = artistName.toLowerCase();
+    for (const line of lines) {
+      if (!line.toLowerCase().includes(name)) continue;
+      // Pattern: Name - instrument
+      const dash = line.match(/^[^-]+\s*[-–—]\s*(.+)$/);
+      if (dash) {
+        const after = dash[1].trim();
+        if (after.length < 80 && !after.includes('http')) {
+          return after.split(/[,;/]/).map(s => s.trim()).filter(s => s.length > 1 && s.length < 40);
+        }
+      }
+      // Pattern: Name (instrument)
+      const parens = line.match(/^[^(]+\(([^)]+)\)\s*$/);
+      if (parens) {
+        return parens[1].split(/[,;/]/).map(s => s.trim()).filter(s => s.length > 1 && s.length < 40);
+      }
+      // Pattern: Name : instrument
+      const colon = line.match(/^[^:]+:\s*(.+)$/);
+      if (colon) {
+        const after = colon[1].trim();
+        if (after.length < 80 && !after.includes('http')) {
+          return after.split(/[,;/]/).map(s => s.trim()).filter(s => s.length > 1 && s.length < 40);
+        }
+      }
+    }
+    return [];
+  }
+
+  function normalizeEventDate(dateStr) {
+    if (!dateStr) return '';
+    // Convert "11. 07. 26" to "2026-07-11"
+    const parts = dateStr.replace(/\.\s*/g, '.').split('.').filter(Boolean);
+    if (parts.length < 3) return dateStr;
+    const [day, month, year] = parts;
+    const fullYear = year.length === 2 ? '20' + year : year;
+    return `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+
+  initPopup();
 });

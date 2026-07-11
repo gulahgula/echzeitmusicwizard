@@ -766,3 +766,55 @@ footer a:hover { color: #b3e5ff; }
   color: #555;
   font-size: 13px;
 }
+
+/* ── Music search links ── */
+
+.music-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.search-icon {
+  font-size: 11px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+  padding: 2px;
+}
+
+.artist-card:hover .search-icon { opacity: 0.8; }
+.search-icon:hover { opacity: 1 !important; }
+
+.search-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 4px;
+  gap: 2px;
+  z-index: 50;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.artist-card:hover .search-menu { display: flex; }
+
+.search-menu a {
+  font-size: 9px;
+  color: #888;
+  text-decoration: none;
+  padding: 3px 6px;
+  border-radius: 3px;
+  transition: all 0.1s;
+  font-weight: 600;
+}
+
+.search-menu a:hover {
+  background: #2a2a2a;
+  color: #e0e0e0;
+}

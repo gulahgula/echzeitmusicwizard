@@ -266,3 +266,24 @@ function formatLead(diffMs) {
   const days = Math.round(hours / 24);
   return `${days} day${days === 1 ? '' : 's'}`;
 }
+
+// ── Music search links ──
+// Creates a compact search menu for YouTube, Spotify, Bandcamp, SoundCloud.
+
+function createMusicSearchLinks(artistName) {
+  const name = encodeURIComponent(artistName);
+  const ytUrl = `https://www.youtube.com/results?search_query=${name}`;
+  const spUrl = `https://open.spotify.com/search/${name}`;
+  const bcUrl = `https://bandcamp.com/search?q=${name}&item_type=a`;
+  const scUrl = `https://soundcloud.com/search?q=${name}`;
+
+  const container = document.createElement('span');
+  container.className = 'music-search';
+  container.innerHTML = `<span class="search-icon">🔍</span><span class="search-menu">` +
+    `<a href="${ytUrl}" target="_blank" title="YouTube">YT</a>` +
+    `<a href="${spUrl}" target="_blank" title="Spotify">SP</a>` +
+    `<a href="${bcUrl}" target="_blank" title="Bandcamp">BC</a>` +
+    `<a href="${scUrl}" target="_blank" title="SoundCloud">SC</a>` +
+    `</span>`;
+  return container;
+}

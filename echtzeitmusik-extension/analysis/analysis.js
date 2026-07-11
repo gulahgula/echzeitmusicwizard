@@ -41,19 +41,30 @@ document.addEventListener('DOMContentLoaded', () => {
   let calDate = new Date();
   
 
-  chrome.storage.local.get(['watchedArtists'], (result) => {
+  async function initAnalysis() {
+    const result = await chrome.storage.local.get(['watchedArtists']);
     watchedArtists = [...new Set((result.watchedArtists || []).map(n => normalizeArtistName(n)))];
     if (watchedArtists.join(',') !== (result.watchedArtists || []).join(',')) {
       chrome.storage.local.set({ watchedArtists });
     }
-    renderArtistTable();
-    renderFollowing();
-    if (currentFilter === 'calendar') renderCalendar();
-  });
+
+    // Read filter from URL hash (e.g. #today)
+    const hashFilter = location.hash.replace('#', '');
+    const validFilters = ['today', 'tomorrow', 'next7', 'month', 'all', 'following', 'calendar'];
+    if (hashFilter && validFilters.includes(hashFilter)) {
+      currentFilter = hashFilter;
+      document.querySelectorAll('.filter-bar button').forEach(b => {
+        b.classList.toggle('active', b.dataset.filter === currentFilter);
+      });
+    }
+
+    loadAndAnalyze(currentFilter);
+  }
 
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.watchedArtists) {
       watchedArtists = changes.watchedArtists.newValue || [];
+      renderArtistTable();
       renderFollowing();
       if (currentFilter === 'calendar') renderCalendar();
     }
@@ -828,6 +839,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const preview = data.events[0];
       const venueInfo = preview ? `${preview.dateStr} ${preview.time} · ${preview.venueName}` : '';
       const isSingleDay = currentFilter === 'today' || currentFilter === 'tomorrow';
+      const searchName = encodeURIComponent(name);
+      const searchLinks = `<div class="music-search"><span class="search-icon">🔍</span><span class="search-menu">` +
+        `<a href="https://www.youtube.com/results?search_query=${searchName}" target="_blank" title="YouTube">YT</a>` +
+        `<a href="https://open.spotify.com/search/${searchName}" target="_blank" title="Spotify">SP</a>` +
+        `<a href="https://bandcamp.com/search?q=${searchName}&item_type=a" target="_blank" title="Bandcamp">BC</a>` +
+        `<a href="https://soundcloud.com/search?q=${searchName}" target="_blank" title="SoundCloud">SC</a>` +
+        `</span></div>`;
       return `<div class="artist-card" data-artist="${escapeHtml(name)}" tabindex="0" role="button" aria-label="Show ${escapeHtml(name)}'s concerts">
         <span class="rank">${i + 1}</span>
         <div class="info">
@@ -835,6 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ${venueInfo ? `<div class="venue-preview">${escapeHtml(venueInfo)}</div>` : ''}
         </div>
         <div class="right-col">
+          ${searchLinks}
           ${!isSingleDay ? `<span class="count ${data.count >= 5 ? 'freq-5' : data.count >= 4 ? 'freq-4' : data.count >= 3 ? 'freq-3' : data.count >= 2 ? 'freq-2' : ''}">${data.count}x</span>` : ''}
           <span class="follow-artist${watched ? ' followed' : ''}" data-artist="${escapeHtml(name)}">${watched ? '✓ Following' : '+ Follow'}</span>
         </div>
@@ -1339,15 +1358,5 @@ document.addEventListener('DOMContentLoaded', () => {
     return d.innerHTML;
   }
 
-  // Read filter from URL hash (e.g. #today)
-  const hashFilter = location.hash.replace('#', '');
-  const validFilters = ['today', 'tomorrow', 'next7', 'month', 'all', 'following', 'calendar'];
-  if (hashFilter && validFilters.includes(hashFilter)) {
-    currentFilter = hashFilter;
-    document.querySelectorAll('.filter-bar button').forEach(b => {
-      b.classList.toggle('active', b.dataset.filter === currentFilter);
-    });
-  }
-
-  loadAndAnalyze(currentFilter);
+  initAnalysis();
 });

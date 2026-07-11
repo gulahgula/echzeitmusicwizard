@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "echtzeitmusik Berlin",
-  "version": "2.1.0",
-  "description": "Berlin experimental music calendar watcher — explore concerts from echtzeitmusik.de, follow artists, get notified before shows.",
+  "version": "2.2.0",
+  "description": "Berlin experimental music calendar watcher — explore concerts from echtzeitmusik.de, follow artists, get notified before shows, and build your artist catalogue.",
   "permissions": [
     "storage",
     "alarms",
@@ -10,7 +10,10 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://echtzeitmusik.de/*"
+    "https://echtzeitmusik.de/*",
+    "https://gulahgula.github.io/*",
+    "https://bandcamp.com/*",
+    "https://*.bandcamp.com/*"
   ],
   "background": {
     "service_worker": "background.js"
