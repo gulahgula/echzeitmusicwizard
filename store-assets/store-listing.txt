@@ -1,0 +1,43 @@
+CHROME WEB STORE LISTING
+=========================
+
+Extension Name: echtzeitmusik Berlin
+Version: 3.0.0
+Category: Productivity (alt: News & Weather)
+Language: English
+
+Short Description (132 chars max — this is exactly 132, matches manifest.json):
+Berlin experimental-music calendar: follow artists from echtzeitmusik.de, get reminders before shows, and build an artist catalogue.
+
+Detailed Description:
+
+A companion for echtzeitmusik.de — the calendar of Berlin's experimental, improvised, and new-music scene. See tonight's concerts in a single popup, follow the artists you care about, and let a quiet archive of the scene build itself as you browse.
+
+FEATURES
+• Tonight at a glance — browse concerts by day, week, month, or all time in a compact two-column popup.
+• Follow artists — one tap, and a reminder lands before their next show (a day / a few hours / an hour ahead) via native notifications.
+• Free-entry marker — shows with free admission are flagged automatically.
+• Artist index — filter the whole programme by instrument or genre and see who's playing, where, and with whom.
+• Your archive — every artist you come across is catalogued locally: instruments, venues, frequent collaborators, and full past & upcoming concert history.
+• Calendar view — a clean month timeline of every date from the artists you follow.
+• One-tap discovery — jump from any artist to Bandcamp, SoundCloud, or a web search.
+• Export any event to your calendar (ICS).
+
+All artist, instrument, and genre data is derived locally from the public echtzeitmusik.de calendar. Nothing is collected, transmitted, or shared — everything stays on your device.
+
+SCREENSHOTS (1280x800, 24-bit PNG, no alpha — in this folder):
+1. 01-tonights-concerts.png   — the popup: tonight's programme, two-column cards, free-entry marker
+2. 02-follow-and-reminders.png — following artists + a pre-show reminder
+3. 03-artist-index.png         — filter by instrument/genre; artist cards with collaborators
+4. 04-your-archive.png         — the local catalogue: instruments, collaborators, concert history
+5. 05-calendar.png             — month timeline of followed artists
+
+At least one screenshot is required; up to five may be uploaded. (Promo tiles are optional and not included.)
+
+NOTES FOR REVIEW
+- Manifest V3.
+- Permissions: storage, alarms, activeTab, scripting, notifications.
+- Host access: https://echtzeitmusik.de/* only. Every network request goes there; nothing is sent out.
+- No content scripts. After you follow an artist from the popup, activeTab + scripting is used once to show a brief in-page confirmation banner on the tab you were viewing — nothing is read from the page.
+- Storage is local only (chrome.storage.local + a local IndexedDB catalogue).
+- Privacy policy included (PRIVACY.md).

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Artist index · echtzeitmusik</title>
+  <link rel="stylesheet" href="analysis.css">
+  <link rel="stylesheet" href="analysis-editorial.css">
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <div>
+        <p class="eyebrow">Berlin experimental music calendar</p>
+        <h1>Artist <em>index</em></h1>
+      </div>
+      <p class="header-note">Browse the people, instruments, and rooms shaping the current programme.</p>
+    </div>
+    <div class="filter-bar">
+      <button data-filter="today" aria-label="Show today's concerts">Today</button>
+      <button data-filter="tomorrow" aria-label="Show tomorrow's concerts">Tomorrow</button>
+      <button data-filter="next7" aria-label="Show next 7 days">Next 7 days</button>
+      <button data-filter="month" class="active" aria-label="Show this month">This month</button>
+      <button data-filter="all" aria-label="Show all concerts">All</button>
+      <button data-filter="following" class="follow-btn" aria-label="Show only followed artists">Following</button>
+      <button data-filter="calendar" aria-label="Calendar view of followed artists">Calendar</button>
+      <button data-filter="catalogue" class="catalogue-btn" aria-label="Artist catalogue — all artists ever seen">Archive</button>
+    </div>
+  </header>
+
+  <div id="loading">Loading concerts and analyzing …</div>
+  <div id="error" class="hidden"></div>
+
+  <main class="hidden">
+    <!-- Narrative overview -->
+    <section id="overview" class="overview-section">
+      <div id="overview-text"></div>
+    </section>
+
+    <!-- Keywords -->
+    <section id="keywords-section">
+      <h2>Instruments & Genres</h2>
+      <div id="kw-container"></div>
+    </section>
+
+    <!-- Artist cards -->
+    <section id="top-artists">
+      <h2 id="artist-heading">Artists</h2>
+      <div id="artist-count"><input type="text" id="artist-filter" placeholder="Search artists…"></div>
+      <div id="artist-list"></div>
+    </section>
+
+    <!-- Following section (collapsible) -->
+    <section id="following-section">
+      <h2 class="collapsible-header collapsed" id="following-header">Following <span id="follow-count"></span> <span class="toggle-arrow">▼</span></h2>
+      <div id="following-content" class="collapsed">
+        <p class="following-desc">You'll be notified before their concerts. Toggle notifications with the 🔔 bell.</p>
+        <div id="follow-list"></div>
+        <div id="no-follows" class="hidden">
+          <p style="color:#666;font-size:13px;">No artists followed yet. Use <strong>+ Follow</strong> on any artist.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calendar view -->
+    <section id="calendar-section" class="hidden">
+      <div class="cal-nav">
+        <button id="cal-prev" aria-label="Previous month">◀</button>
+        <span id="cal-month-label">January 2026</span>
+        <button id="cal-next" aria-label="Next month">▶</button>
+      </div>
+      <div id="cal-ruler"></div>
+      <div id="cal-timeline"></div>
+    </section>
+
+    <!-- Catalogue view -->
+    <section id="catalogue-section" class="hidden">
+      <div class="catalogue-controls">
+        <input type="text" id="catalogue-search" placeholder="Search artists, instruments, venues…" autocomplete="off">
+        <div class="catalogue-filter-row">
+          <select id="catalogue-filter-instrument"><option value="">All instruments</option></select>
+          <select id="catalogue-filter-venue"><option value="">All venues</option></select>
+          <select id="catalogue-sort">
+            <option value="activity">Most active</option>
+            <option value="name">Name A-Z</option>
+            <option value="recent">Recently seen</option>
+            <option value="venues">Most venues</option>
+          </select>
+        </div>
+      </div>
+      <div id="catalogue-count" class="catalogue-count"></div>
+      <div id="catalogue-list"></div>
+      <div id="catalogue-empty" class="catalogue-empty">
+        <p>No artists in your catalogue yet. Browse concerts in the popup or here to auto-collect artists as you go.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span><a href="#" id="export-data">Export</a> · <a href="#" id="open-about">About</a></span>
+    <span><a href="https://buymeacoffee.com/gulahgula" target="_blank" rel="noopener" class="tip-link">Support the project ↗</a></span>
+    <span>Data from <a href="https://echtzeitmusik.de" target="_blank" rel="noopener">echtzeitmusik.de</a></span>
+  </footer>
+
+  <script src="../shared/dictionaries.js"></script>
+  <script src="../shared/extractor.js"></script>
+  <script src="../shared/parser.js"></script>
+  <script src="../shared/catalogue-db.js"></script>
+  <script src="analysis.js"></script>
+</body>
+</html>

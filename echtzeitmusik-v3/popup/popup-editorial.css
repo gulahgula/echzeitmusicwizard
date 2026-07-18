@@ -1,0 +1,304 @@
+/* ── 2026 editorial skin ─────────────────────────────────────────────── */
+:root {
+  --paper: #f4f0e7;
+  --ink: #1a1d18;
+  --muted: #4a4d43;
+  --line: #b8b1a4;
+  --lime: #a8d91e;
+  --coral: #d45540;
+  --blue: #2a5078;
+  --green: #2d5e48;
+}
+
+html { min-height: 500px; }
+body {
+  width: 500px;
+  min-height: 500px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 14px;
+  letter-spacing: .005em;
+}
+
+#app { min-height: 500px; background: var(--paper); }
+header {
+  padding: 17px 18px 12px;
+  color: var(--ink);
+  background: linear-gradient(115deg, #f9f6ef 0%, #edf0d9 100%);
+  border-bottom: 1px solid var(--ink);
+  box-shadow: none;
+}
+.header-row { margin-bottom: 13px; }
+.eyebrow {
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.header-row h1 {
+  color: var(--ink);
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -.06em;
+  line-height: .92;
+}
+.header-row h1 span { color: var(--coral); font-style: italic; }
+
+.filter-bar { gap: 5px; }
+.filter-bar button {
+  min-width: 0;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+.filter-bar button:hover { background: #ded9cd; color: var(--ink); }
+.filter-bar button.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.filter-bar button.dimmed { opacity: 0.5; text-decoration: line-through; color: var(--muted); }
+.wizard-bar { margin-top: 12px; }
+.wizard-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--lime);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: .025em;
+}
+.wizard-btn span { font-weight: 800; text-transform: uppercase; }
+.wizard-btn b { font-size: 15px; line-height: .5; }
+.wizard-btn:hover { background: #d9ff7b; box-shadow: 5px 5px 0 var(--ink); transform: translate(-1px, -1px); }
+
+#content { background: var(--paper); }
+#loading, #error { color: var(--muted); }
+.overview-section {
+  padding: 14px 18px 13px;
+  background: #e7e9dc;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+.overview-section .stat { color: var(--ink); }
+.overview-section .venue-name { color: var(--blue); }
+.followed-hint { border-color: #ced1c2; }
+.followed-hint-artist, .artist-name.followed { color: var(--green); }
+
+.event { padding: 10px 16px 11px; border-color: var(--line); }
+.event:hover { background: #ebe7de; }
+.event:active { background: #e2ddd2; }
+.event-featured {
+  margin: 10px 12px 12px;
+  padding: 13px 15px 14px;
+  background: var(--ink);
+  color: var(--paper);
+  border: 0;
+  box-shadow: 5px 5px 0 var(--coral);
+}
+.event-featured:hover, .event-featured:active { background: var(--ink); }
+.event-lead {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 3px 6px;
+  background: var(--lime);
+  color: var(--ink);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* ── Two-column body: when/where (left) · programme (right) ── */
+.event-body {
+  display: grid;
+  grid-template-columns: 116px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.event-when {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  border-right: 1px solid #d4d0c6;
+  padding-right: 12px;
+}
+.event-featured .event-when { border-right-color: #4a4d44; }
+.event-what {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.event-time { color: var(--coral); font-family: "SFMono-Regular", Consolas, monospace; font-size: 16px; font-weight: 700; letter-spacing: .01em; }
+.event-day { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; line-height: 1.35; }
+.event-address { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; line-height: 1.35; word-break: break-word; }
+.event-venue { font-size: 14px; font-weight: 700; letter-spacing: -.02em; line-height: 1.18; margin-top: 4px; word-break: break-word; }
+.event-venue a { color: var(--ink); text-decoration-color: var(--coral); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.event-desc { color: #5f625a; font-size: 12px; line-height: 1.42; }
+
+/* Free-entry marker */
+.event-free {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 2px 6px;
+  background: var(--lime);
+  color: var(--ink);
+  border-radius: 3px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.event-featured .event-day, .event-featured .event-address, .event-featured .event-desc { color: #c5c5ba; }
+.event-featured .event-time { color: var(--lime); }
+.event-featured .event-venue a, .event-featured .artist-tag { color: var(--paper); }
+.event-featured .artist-tag { border-color: #6b6f64; }
+.event-featured .follow-btn { border-color: #6b6f64; color: var(--lime); }
+.event-featured .event-links a, .event-featured .event-links a.calendar-link { color: var(--lime); }
+.event-featured .search-icon { color: var(--lime); }
+
+/* Programme note — always fully visible, first thing in the right column */
+.event-note-full { color: #5f625a; font-size: 11.5px; line-height: 1.45; }
+
+/* Artist discovery actions are visible by default: listening is the point. */
+.artist-actions { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; margin-right: 4px; flex: 0 0 auto; }
+  .artist-actions a { font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; font-weight: 700; line-height: 1; text-decoration: none; }
+.artist-listen { display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; background: var(--lime); border: 1px solid var(--ink); border-radius: 999px; color: var(--ink); }
+  .artist-listen::before { content: ''; width: 10px; height: 10px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E"); background-size: contain; }
+  .artist-listen:hover { background: var(--coral); }
+.artist-about { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; color: var(--blue); transition: all 0.15s ease; }
+.artist-about::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.5' y2='16.5'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.5' y2='16.5'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.artist-about:hover { background: var(--coral); color: var(--ink); transform: scale(1.1); }
+.artist-platforms { display: inline-flex; align-items: center; gap: 4px; }
+.artist-platform {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.15s ease;
+}
+.artist-platform:hover {
+  background: var(--coral);
+  color: var(--ink);
+  transform: scale(1.1);
+}
+/* Icons use CSS masks so they inherit `color` (muted → coral/brand on hover);
+   an SVG in background-image can't read currentColor and would render black. */
+.artist-platform::before {
+  content: '';
+  background-color: currentColor;
+}
+.artist-platform[data-platform="bandcamp"]::before {
+  width: 15px; height: 15px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M0 18.75l7.437-13.5H24l-7.437 13.5H0z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M0 18.75l7.437-13.5H24l-7.437 13.5H0z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.artist-platform[data-platform="soundcloud"]::before {
+  width: 17px; height: 17px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M1 14.5h1v3H1zM3 12h1v5.5H3zM5 10h1v7.5H5zM7 13h1v4.5H7zM9 8.5h1v9H9zM11 11h1v6.5h-1zM13.6 9.2c-.36 0-.7.08-1 .22-.2-2.3-2.13-4.12-4.5-4.12-.58 0-1.14.12-1.64.32-.2.08-.25.16-.25.33v11.2c0 .17.13.3.3.32h7.09c1.55 0 2.8-1.26 2.8-2.8 0-1.55-1.25-2.8-2.8-2.8z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M1 14.5h1v3H1zM3 12h1v5.5H3zM5 10h1v7.5H5zM7 13h1v4.5H7zM9 8.5h1v9H9zM11 11h1v6.5h-1zM13.6 9.2c-.36 0-.7.08-1 .22-.2-2.3-2.13-4.12-4.5-4.12-.58 0-1.14.12-1.64.32-.2.08-.25.16-.25.33v11.2c0 .17.13.3.3.32h7.09c1.55 0 2.8-1.26 2.8-2.8 0-1.55-1.25-2.8-2.8-2.8z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.artist-platform[data-platform="youtube"]::before {
+  width: 16px; height: 16px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.event-featured .artist-listen { border-color: var(--lime); }
+.event-featured .artist-about { color: var(--lime); border-color: var(--lime); }
+.event-featured .artist-platform { color: #c5c5ba; }
+.event-has-followed:not(.event-is-now):not(.event-is-soon) { padding-left: 29px; }
+.event-has-followed:not(.event-is-now):not(.event-is-soon)::before { left: 13px; width: 7px; height: 7px; background: var(--green); }
+.event-is-now, .event-is-soon { padding-left: 31px; }
+.event-is-now::before, .event-is-soon::before { width: 20px; color: var(--ink); font-family: "SFMono-Regular", Consolas, monospace; font-size: 7px; }
+.event-is-now::before { background: var(--lime); }
+.event-is-soon::before { background: var(--coral); }
+
+/* Identified artists: aligned rows at the bottom of the card */
+.event-artists {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid #d4d0c6;
+  padding-top: 4px;
+}
+.event-featured .event-artists { border-top-color: #4a4d44; }
+.artist-tag {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 6px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed #d8d4ca;
+  border-radius: 0;
+  padding: 4px 0;
+  font-size: 11.5px;
+}
+.artist-tag:last-child { border-bottom: 0; }
+.artist-tag:hover { border-color: var(--ink); background: transparent; }
+.event-featured .artist-tag { border-bottom-color: #4a4d44; }
+.artist-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Links live in the left column, stacked under venue/address */
+.event-when .event-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 8px;
+}
+.follow-btn { flex: 0 0 auto; width: 58px; text-align: right; color: var(--blue); border: 0; border-left: 1px solid var(--line); border-radius: 0; margin-left: 2px; padding: 0 0 0 6px; font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; cursor: pointer; }
+.follow-btn:hover { color: var(--coral); border-color: var(--line); }
+.follow-btn.followed { color: var(--green); border-color: var(--line); }
+.search-icon { opacity: .75; color: var(--blue); }
+.search-menu { background: var(--ink); border: 0; border-radius: 2px; box-shadow: 3px 3px 0 var(--coral); }
+.search-menu a { color: var(--paper); }
+.search-menu a:hover { background: transparent; color: var(--lime); }
+.event-links { gap: 7px; }
+.event-links a { padding: 0; border: 0; border-radius: 0; color: var(--blue); font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; text-decoration: underline; text-underline-offset: 3px; }
+.event-links a:hover { background: transparent; border: 0; color: var(--coral); }
+.event-links a.calendar-link { color: var(--ink); border: 0; }
+.event-links a.calendar-link:hover { background: transparent; color: var(--coral); }
+.event-links a.screenshot-btn { color: var(--blue); border: 0; text-decoration: underline; }
+.event-links a.screenshot-btn:hover { background: transparent; color: var(--coral); }
+.event-count { padding: 10px 18px 4px; color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+
+.notif-list-item { margin: 10px 14px; padding: 12px; background: #e7e9dc; border: 1px solid var(--ink); border-left: 5px solid var(--coral); border-radius: 0; }
+.notif-list-artist { color: var(--ink); }
+.notif-list-detail { color: var(--muted); }
+.popup-toast { background: var(--ink); border: 0; border-left: 4px solid var(--lime); border-radius: 0; color: var(--paper); box-shadow: 4px 4px 0 var(--coral); }
+footer { padding: 10px 18px; background: var(--ink); border: 0; box-shadow: none; }
+footer a { color: #d8d5ca; font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; }
+footer a:hover { color: var(--lime); }
+footer a.tip-link { color: var(--lime); }
