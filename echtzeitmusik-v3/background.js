@@ -199,34 +199,44 @@ async function checkThresholds(notifId, artistName, ev, eventDate) {
   const leadMs = eventDate.getTime() - Date.now();
   if (leadMs <= 0) return;
 
-  const result = await storageGet(['notifiedThresholds', 'dismissedNotifIds', 'notifMode']);
+  const result = await storageGet(['notifiedThresholds', 'notifMode']);
   if (result.notifMode === 'off') return;
-  if ((result.dismissedNotifIds || []).includes(notifId)) return;
+  // Note: dismissing a notification (clicking it, or clearing it from the popup
+  // list) intentionally does NOT suppress the time-based reminders here. Dismiss
+  // means "clear this from my unread list", not "never remind me about this show
+  // again" — each 1d/5h/3h/1h band still fires once (tracked in notifiedThresholds).
+  // To silence everything, the user turns notifications off (notifMode).
 
   const nt = result.notifiedThresholds || {};
   const done = [...(nt[notifId] || [])];
   const info = `${ev.dayOfWeek} ${ev.displayDate || ev.dateStr} · ${ev.time} at ${ev.venueName}`;
 
-  let selectedThreshold = null;
-  for (const th of [...THRESHOLDS].reverse()) {
-    if (leadMs <= th.ms && !done.includes(th.key)) {
-      selectedThreshold = th;
-      break;
-    }
-  }
+  // Every band the event has already entered. The tightest un-fired one is the
+  // reminder to show; the wider ones are moot (we are already past them) and must
+  // be marked done too — otherwise a band that was never crossed live (following
+  // an artist 2h before the show never crosses "1d") fires on a later tick as a
+  // bogus "starts in 1 day".
+  const entered = THRESHOLDS.filter(th => leadMs <= th.ms);
+  const tightest = entered.reduce((a, b) => (b.ms < a.ms ? b : a), entered[0]);
+  const shouldFire = tightest && !done.includes(tightest.key);
+  for (const th of entered) if (!done.includes(th.key)) done.push(th.key);
 
-  if (selectedThreshold) {
-    done.push(selectedThreshold.key);
-    const message = `${info} — starts in ${selectedThreshold.key}`;
+  if (shouldFire) {
     const opts = {
       type: 'basic',
       iconUrl: 'icons/icon128.png',
       title: artistName,
-      message,
+      // Report the real remaining time, not the band name: checks run on an
+      // interval, so a "1h" band can be evaluated well inside the hour.
+      message: `${info} — starts in ${formatLead(leadMs)}`,
       priority: 2,
     };
-    const existed = await chrome.notifications.update(notifId, opts).catch(() => false);
-    if (!existed) chrome.notifications.create(notifId, opts);
+    // Re-alert properly. chrome.notifications.update() rewrites an existing
+    // notification SILENTLY (no popup) — and persistNotification already created
+    // one under this same id when it first saw the event, so every reminder was
+    // being swallowed. Clear first, then create, so each reminder actually shows.
+    await chrome.notifications.clear(notifId).catch(() => {});
+    chrome.notifications.create(notifId, opts);
   }
 
   if (done.length > (nt[notifId] || []).length) {

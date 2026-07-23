@@ -1,5 +1,27 @@
 # echtzeitmusik v3.0.0
 
+## Reminder notifications fixed (July 2026, round 7)
+
+The 1-day / 5-hour / 3-hour / 1-hour reminders never popped up. Three bugs in
+`background.js` `checkThresholds()`:
+
+- **Reminders were silently swallowed.** It re-alerted via
+  `chrome.notifications.update()`, which rewrites an existing notification
+  *without* showing anything — and `persistNotification()` had already created a
+  notification under the same id, so every reminder just quietly edited that old
+  one. Now it `clear()`s then `create()`s, forcing a real alert.
+- **Stale wide bands fired late with wrong labels.** Only the matched band was
+  marked done, so a band never crossed live (following an artist 2 h before the
+  show never crosses "1 day") fired on a later tick as a bogus "starts in 1 day"
+  — sometimes with the label going *backwards* between checks. Now every entered
+  band is marked done, and the message reports the real remaining time
+  (`formatLead`) instead of the band name, since checks run on an interval.
+- **Dismissing a notification cancelled all its future reminders.** Clicking a
+  notification adds its id to `dismissedNotifIds`, and `checkThresholds` bailed
+  on that set — so one click killed every later reminder for that show. Dismiss
+  now means "clear from the unread list" only; the time-based reminders still
+  fire (turn notifications off to silence everything).
+
 ## Pre-submission review — security & correctness (July 2026, round 6)
 
 Full audit across every feature before Chrome Web Store upload.
